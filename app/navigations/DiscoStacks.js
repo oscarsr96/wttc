@@ -3,12 +3,13 @@ import DiscosScreen from "../screens/Discos/DiscosScreen";
 import AddDiscoScreen from "../screens/Discos/AddDisco";
 import Disco from "../screens/Discos/Disco";
 import AddReviewDiscoScreen from "../screens/Discos/AddReviewDisco";
+import Fiesta from "../screens/Discos/Fiesta";
 
 const DiscosScreenStacks = createStackNavigator({
-  Discos: {
+  Events: {
     screen: DiscosScreen,
     navigationOptions: () => ({
-      title: "Discos"
+      title: "Events"
     })
   },
   AddDisco: {
@@ -27,6 +28,13 @@ const DiscosScreenStacks = createStackNavigator({
     screen: AddReviewDiscoScreen,
     navigationOptions: (props) => ({
       title: "New review"
+    })
+  },
+  Fiesta: {
+    screen: Fiesta,
+    navigationOptions: (props) => ({
+      //TODO: sacar el company Name de la base de datos
+      title: "Ir a " + (props.navigation.state.params.idCompany).toString()
     })
   }
 

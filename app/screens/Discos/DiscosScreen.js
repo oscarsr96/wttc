@@ -26,15 +26,15 @@ export default function DiscosScren(props) {
   }, []);
 
   useEffect(() => {
-    db.collection("discos").get().then((snap) => {
+    db.collection("events").get().then((snap) => {
       setTotalDiscos(snap.size);
     });
 
     (async () => {
       const resultDiscos = [];
-      const discos = db.collection("discos").orderBy("createAt", "desc").limit(limitDiscos);
+      const events = db.collection("events").orderBy("createAt", "desc").limit(limitDiscos);
 
-      await discos.get().then(response => {
+      await events.get().then(response => {
         setStartDisco(response.docs[response.docs.length - 1]);
 
         response.forEach(doc => {
@@ -43,7 +43,7 @@ export default function DiscosScren(props) {
           resultDiscos.push({disco});
         });
         setDiscos(resultDiscos);
-        
+
       });
     })();
     setIsReloadDiscos(false)
@@ -53,13 +53,13 @@ export default function DiscosScren(props) {
     const resultDiscos = [];
     discos.length < totalDiscos && setIsLoading(true);
 
-    const discosDB = db
-                     .collection("discos")
+    const eventsDB = db
+                     .collection("events")
                      .orderBy("createAt", "desc")
                      .startAfter(startDisco.data().createAt)
                      .limit(limitDiscos);
 
-    await discosDB.get().then(response => {
+    await eventsDB.get().then(response => {
       if(response.docs.lenght > 0){
         setStartDisco(response.docs[response.docs.length - 1])
       } else {

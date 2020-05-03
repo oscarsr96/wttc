@@ -47,7 +47,7 @@ export default function AddReviewDisco(props){
   }
 
   const updateDisco = () => {
-    const discoRef = db.collection("discos").doc(idDisco);
+    const discoRef = db.collection("events").doc(idDisco);
 
     discoRef.get().then(response => {
       const discoData = response.data();

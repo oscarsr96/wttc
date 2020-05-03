@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {StyleSheet, View, ScrollView, Text, Dimensions} from 'react-native';
 import Carousel from "../../components/Carousel";
-import { Rating, Icon, ListItem } from "react-native-elements";
+import { Rating, Icon, ListItem, Button } from "react-native-elements";
 import Map from '../../components/Map';
 import ListReviews from '../../components/Discos/ListReviews';
 import Toast from 'react-native-easy-toast';
@@ -128,14 +128,26 @@ export default function Disco(props){
       <DiscoInfo
         location={disco.location}
         name={disco.name}
-        address={disco.address}
-        phone={disco.phone}
+        address={disco.location.address}
+        phones={disco.phones}
         price={disco.price}
+        city={disco.city}
+        startDate={disco.startDate}
+        endDate={disco.endDate}
+        capacity={disco.location.capacity}
+        emailCompany={disco.emailCompany}
+
       />
       <ListReviews
         navigation={navigation}
         idDisco={disco.id}
         setRating={setRating}
+      />
+      <Button
+        title="Vámonos de fiesta"
+        containerStyle={styles.btnContainer}
+        buttonStyle={styles.btn}
+        onPress={() => navigation.navigate("Fiesta", {idCompany: disco.idCompany, rules: disco.rules})}
       />
       <Toast ref={toastRef} position="center" opacity={0.5}/>
     </ScrollView>
@@ -163,8 +175,9 @@ function TitleDisco(props){
 }
 
 function DiscoInfo(props){
-  const { location, name, address, phone, price } = props;
-
+  const { location, name, address, phones, price, city, startDate, endDate,
+          capacity, emailCompany} = props;
+  console.log(startDate)
   const listInfo = [
     {
       text: address,
@@ -173,7 +186,7 @@ function DiscoInfo(props){
       action: null
     },
     {
-      text: phone,
+      text: phones[0],
       iconName: "phone",
       iconType: "material-community",
       action: null
@@ -183,12 +196,42 @@ function DiscoInfo(props){
       iconName: "currency-eur",
       iconType: "material-community",
       action: null
+    },
+    {
+      text: city,
+      iconName: "city",
+      iconType: "material-community",
+      action: null
+    },
+    {
+      text: startDate,
+      iconName: "calendar",
+      iconType: "material-community",
+      action: null
+    },
+    {
+      text: endDate,
+      iconName: "calendar",
+      iconType: "material-community",
+      action: null
+    },
+    {
+      text: capacity,
+      iconName: "alert",
+      iconType: "material-community",
+      action: null
+    },
+    {
+      text: emailCompany[0],
+      iconName: "email",
+      iconType: "material-community",
+      action: null
     }
   ];
 
   return(
     <View style={styles.viewDiscoInfo}>
-      <Text style={styles.discoInfoText}>  Disco info </Text>
+      <Text style={styles.discoInfoText}>  Event info </Text>
       <Map
         location={location}
         name={name}
@@ -251,5 +294,12 @@ const styles = StyleSheet.create({
     paddingBottom: 5,
     paddingLeft: 15,
     paddingRight: 5
+  },
+  btnContainer:{
+    marginTop:20,
+    width:"100%",
+  },
+  btn:{
+    backgroundColor: "#00a680"
   }
 })

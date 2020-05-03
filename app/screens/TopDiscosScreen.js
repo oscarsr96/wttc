@@ -16,7 +16,7 @@ export default function TopDiscosScreen(props) {
 
   useEffect(() =>{
     (async () =>{
-      db.collection("discos")
+      db.collection("events")
         .orderBy("rating", "desc")
         .limit(5)
         .get()

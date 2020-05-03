@@ -87,7 +87,7 @@ const getDataDiscos = idDiscosArray => {
   const arrayDiscos = [];
 
   idDiscosArray.forEach(idDisco => {
-    const result = db.collection("discos").doc(idDisco).get();
+    const result = db.collection("events").doc(idDisco).get();
     arrayDiscos.push(result)
   });
 

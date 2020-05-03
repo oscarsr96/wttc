@@ -20,41 +20,49 @@ const WidthScreen = Dimensions.get("window").width;
 export default function AddDiscoForm(props){
   const { toastRef, setIsLoading, navigation, setIsReloadDiscos } = props;
   const [imagesSelected, setImagesSelected] = useState([])
-  const [discoName, setDiscoName] = useState("");
-  const [discoAddress, setDiscoAddress] = useState("");
-  const [discoDescription, setDiscoDescription] = useState("");
-  const [discoPhone, setDiscoPhone] = useState("")
-  const [discoPrice, setDiscoPrice] = useState("")
+  const [eventName, setEventName] = useState("");
+  const [eventAddress, setEventAddress] = useState("");
+  const [eventDescription, setEventDescription] = useState("");
+  const [eventPhone, setEventPhone] = useState("")
+  const [eventPrice, setEventPrice] = useState("")
+  const [eventCity, setEventCity] = useState("")
+  const [eventStartDate, setEventStartDate] = useState("")
+  const [eventEndDate, setEventEndDate] = useState("")
+  const [eventCapacity, setEventCapacity] = useState("")
+  const [eventEmail, setEventEmail] = useState("")
   const [isVisibleMap, setIsVisibleMap] = useState(false);
-  const [locationDisco, setLocationDisco] = useState(null);
+  const [locationEvent, setLocationEvent] = useState(null);
 
   const addDisco = () => {
-    if(!discoName || !discoAddress || !discoDescription || !discoPhone || !discoPrice){
+    if(!eventName || !eventAddress || !eventDescription || !eventPhone || !eventPrice){
       toastRef.current.show("Add fields are mandatory", 1500);
     } else if (imagesSelected.length === 0){
       toastRef.current.show("You must upload at least one picture", 1500);
-    } else if (!locationDisco){
+    } else if (!locationEvent){
       toastRef.current.show("You must add the location in the map", 1500);
     } else {
       setIsLoading(true);
       uploadImagesStorage(imagesSelected).then(arrayImages => {
-        db.collection("discos").add({
-          name: discoName,
-          address: discoAddress,
-          description: discoDescription,
-          phone: discoPhone,
-          price: discoPrice,
-          location: locationDisco,
+        db.collection("events").add({
+          name: eventName,
+          idCompany: 1,
+          startDate: new Date().toUTCString(),
+          endDate: new Date().toUTCString(),
+          city: eventCity,
+          emailCompany: [eventEmail],
+          description: eventDescription,
+          phones: [eventPhone],
+          rules: ["dress code", "mayores de 18"],
+          price: eventPrice,
+          location: locationEvent,
           images: arrayImages,
-          rating:0,
-          ratingTotal:0,
-          quantityVoting:0,
+          rating:4.5,
           createAt: new Date(),
           createBy: firebase.auth().currentUser.uid
         }).then(() =>{
           setIsLoading(false);
           setIsReloadDiscos(true);
-          navigation.navigate("Discos");
+          navigation.navigate("Events");
         }).catch(() => {
           setIsLoading(false);
           toastRef.current.show("Error when uploading disco, try later", 1500);
@@ -87,13 +95,18 @@ export default function AddDiscoForm(props){
     <ScrollView>
       <MainImage imageDisco={imagesSelected[0]}/>
       <FormAdd
-        setDiscoName={setDiscoName}
-        setDiscoAddress={setDiscoAddress}
-        setDiscoDescription={setDiscoDescription}
-        setDiscoPhone={setDiscoPhone}
-        setDiscoPrice={setDiscoPrice}
+        setEventName={setEventName}
+        setEventAddress={setEventAddress}
+        setEventDescription={setEventDescription}
+        setEventPhone={setEventPhone}
+        setEventPrice={setEventPrice}
         setIsVisibleMap={setIsVisibleMap}
-        locationDisco={locationDisco}
+        setEventCity={setEventCity}
+        setEventStartDate={setEventStartDate}
+        setEventEndDate={setEventEndDate}
+        setEventCapacity={setEventCapacity}
+        setEventEmail={setEventEmail}
+        locationEvent={locationEvent}
         />
       <UploadImage
         imagesSelected = {imagesSelected}
@@ -108,7 +121,7 @@ export default function AddDiscoForm(props){
       <Map
         isVisibleMap={isVisibleMap}
         setIsVisibleMap={setIsVisibleMap}
-        setLocationDisco={setLocationDisco}
+        setLocationEvent={setLocationEvent}
         toastRef={toastRef}
       />
     </ScrollView>
@@ -208,7 +221,7 @@ function UploadImage(props){
 }
 
 function Map(props){
-  const { isVisibleMap, setIsVisibleMap, setLocationDisco, toastRef} = props;
+  const { isVisibleMap, setIsVisibleMap, setLocationEvent, toastRef} = props;
   const [location, setLocation] = useState(null);
 
   useEffect(() => {
@@ -224,14 +237,16 @@ function Map(props){
           latitude: loc.coords.latitude,
           longitude: loc.coords.longitude,
           longitudeDelta: 0.001,
-          latitudeDelta: 0.001
+          latitudeDelta: 0.001,
+          capacity: 200,
+          address: "aaa"
         })
       }
     })();
   }, []);
 
   const confirmLocation = () => {
-    setLocationDisco(location);
+    setLocationEvent(location);
     toastRef.current.show("Location successfully added", 2000);
     setIsVisibleMap(false)
   }
@@ -276,45 +291,80 @@ function Map(props){
 }
 
 function FormAdd(props){
-  const { setDiscoName,setDiscoAddress,setDiscoDescription,setIsVisibleMap, setDiscoPhone, setDiscoPrice ,locationDisco } = props;
+  const { setEventName,setEventAddress,setEventDescription,setIsVisibleMap, setEventPhone, setEventPrice,
+          setEventCity, setEventStartDate, setEventEndDate,
+          setEventEmail, locationEvent } = props;
 
   return(
     <View style={styles.viewForm}>
       <Input
-        placeholder="Disco name"
+        placeholder="Event name"
         containerStyle={styles.input}
-        onChange={e => setDiscoName(e.nativeEvent.text)}
+        onChange={e => setEventName(e.nativeEvent.text)}
        />
+       <Input
+         placeholder="Capacity"
+         multiline={false}
+         rightIcon={{
+           type: "material-community",
+           name: "currency-eur",
+           color: "#00a680"
+         }}
+         containerStyle={styles.input}
+         onChange={e => setEventCapacity(e.nativeEvent.text)}
+        />
        <Input
          placeholder="Adress"
          containerStyle={styles.input}
          rightIcon={{
            type: "material-community",
            name: "google-maps",
-           color: locationDisco ? "#00a680" : "#c2c2c2",
+           color: locationEvent ? "#00a680" : "#c2c2c2",
            onPress: () => setIsVisibleMap(true)
          }}
-         onChange={e => setDiscoAddress(e.nativeEvent.text)}
+         onChange={e => setEventAddress(e.nativeEvent.text)}
+        />
+      <Input
+        placeholder="Description"
+        multiline={true}
+        inputContainerStyle={styles.textArea}
+        onChange={e => setEventDescription(e.nativeEvent.text)}
+       />
+       <Input
+         placeholder="Phone"
+         multiline={false}
+         rightIcon={{
+           type: "material-community",
+           name: "phone",
+           color: "#00a680"
+         }}
+         containerStyle={styles.input}
+         onChange={e => setEventPhone(e.nativeEvent.text)}
         />
         <Input
-          placeholder="Description"
-          multiline={true}
-          inputContainerStyle={styles.textArea}
-          onChange={e => setDiscoDescription(e.nativeEvent.text)}
+          placeholder="Drink price"
+          multiline={false}
+          rightIcon={{
+            type: "material-community",
+            name: "currency-eur",
+            color: "#00a680"
+          }}
+          containerStyle={styles.input}
+          onChange={e => setEventPrice(e.nativeEvent.text)}
          />
          <Input
-           placeholder="Phone"
+           placeholder="City"
            multiline={false}
            rightIcon={{
              type: "material-community",
-             name: "phone",
+             name: "currency-eur",
              color: "#00a680"
            }}
            containerStyle={styles.input}
-           onChange={e => setDiscoPhone(e.nativeEvent.text)}
+           onChange={e => setEventCity(e.nativeEvent.text)}
           />
           <Input
-            placeholder="Drink price"
+            placeholder="Email"
             multiline={false}
             rightIcon={{
               type: "material-community",
@@ -322,7 +372,7 @@ function FormAdd(props){
               color: "#00a680"
             }}
             containerStyle={styles.input}
-            onChange={e => setDiscoPrice(e.nativeEvent.text)}
+            onChange={e => setEventEmail(e.nativeEvent.text)}
            />
     </View>
   )
